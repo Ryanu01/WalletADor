@@ -74,9 +74,11 @@ function Assets({publicKey}: {
         <br />
 
         <div className="flex justify-between">
-            <div></div>
             <div>
-                <PrimaryButton onClick={() => {
+                
+            </div>
+            <div>
+                <PrimaryButton className="cursor-pointer" onClick={() => {
                     navigator.clipboard.writeText(publicKey)
                     setCopied(true)
                 }}>{copied ? "Copied" : "Your wallet address"}</PrimaryButton>
