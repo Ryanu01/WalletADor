@@ -18,6 +18,9 @@ datasource db {
 model User {
   id              String      @id @default(uuid())
   username        String
+  name            String?
+  profiePicture   String?
+  sub             String      @default("")
   password        String?
   SolWalletId     String?
   SolWallet       SOlWallet?
