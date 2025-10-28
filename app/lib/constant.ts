@@ -2,29 +2,40 @@ import { Connection } from "@solana/web3.js"
 import axios from "axios";
 
 
-let LAST_UPDATED: number | null = null;
+let LAST_UPDATED: number | null = null;6
 let prices: {
     [key: string]: {
         usdPrice: number
     }
 } = {}
 const TOKEN_PRICE_REFERESH_INTERVAl = 60 * 1000
-export let SUPPORTED_TOKENS: {
+export interface TokenDetails {
     name: string,
     mint: string,
-    native: boolean
-}[] = [{
+    native: boolean,
+    price: string
+    image: string
+}
+export const SUPPORTED_TOKENS: TokenDetails[] = [{
     name: "USDC",
     mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-    native: false
+    native: false,
+    price: "1",
+    image: 'https://imgs.search.brave.com/Hs-InvveRF-d_DtjChjGUfHxPPV9QvyZ4d8OqWWATtA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS81/MTIvMTQ0NDYvMTQ0/NDYyODUucG5n'
 }, {
     name: "USDT",
     mint: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
-    native: false
+    native: false,
+    price: "1",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvSxrpym7ij1Hf6zQOltcDORlrJGyj1kPf3A&s",
+
 }, {
     name: "SOL",
     mint: "So11111111111111111111111111111111111111112",
-    native: true
+    native: true,
+    price: "202",
+    image: "https://upload.wikimedia.org/wikipedia/commons/3/34/Solana_cryptocurrency_two.jpg",
+
 }]
 
 
@@ -57,4 +68,4 @@ export async function getSupportedTokens() {
         price: prices[s.name]?.usdPrice?.toString() ?? "0"
     }))
 }
-// getSupportedTokens()
+getSupportedTokens()
