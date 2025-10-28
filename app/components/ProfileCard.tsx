@@ -11,7 +11,7 @@ import {  useTokens } from "../api/hooks/useToken";
 import { TokenList, TokenRowSkeleton } from "./TokenList";
 
 type Tab = "tokens" | "send" | "add_funds" | "swap" | "withdraw"
-const tabs: Tab[] = ["tokens", "send", "add_funds", "swap", "withdraw"];
+const tabs: {id: Tab, name: string}[] = [{ id: "tokens", name:  "Token"}, {id: "send", name: "Send"}, {id: "add_funds", name: "Add Funds"}, {id: "swap", name: "Swap"}, {id: "withdraw", name: "Withdraw"}];
 
 export const ProfileCard = ({publicKey}: {
     publicKey: string
@@ -33,9 +33,11 @@ export const ProfileCard = ({publicKey}: {
                     image={session.data?.user?.image ?? ""}
                     name={session.data?.user?.name ?? ""}
                 />
-                {tabs.map(tab => <TabButton active={tab === selectedtab} onClick={() => {
-                    setSelectedTab(tab)
-                }}>{tab}</TabButton>)}
+                <div className="w-full flex">
+                    {tabs.map(tab => <TabButton active={tab.name === selectedtab} onClick={() => {
+                        setSelectedTab(tab.name)
+                    }}>{tab.name.toLocaleUpperCase()}</TabButton>)}
+                </div>
                 <div className={`${selectedtab === "tokens" ? "visible"  : "hidden"}`}><Assets publicKey={publicKey} />
                 </div>
             </div>
