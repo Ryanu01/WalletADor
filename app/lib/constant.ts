@@ -68,4 +68,4 @@ export async function getSupportedTokens() {
         price: prices[s.name]?.usdPrice?.toString() ?? "0"
     }))
 }
-getSupportedTokens()
+// getSupportedTokens()

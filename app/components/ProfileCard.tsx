@@ -4,18 +4,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation";
-import { PrimaryButton } from "./Button";
-import { useEffect, useState } from "react";
+import { PrimaryButton, TabButton } from "./Button";
+import { useActionState, useEffect, useState } from "react";
 import Image from "next/image";
 import {  useTokens } from "../api/hooks/useToken";
 import { TokenList, TokenRowSkeleton } from "./TokenList";
 
+type Tab = "tokens" | "send" | "add_funds" | "swap" | "withdraw"
+const tabs: Tab[] = ["tokens", "send", "add_funds", "swap", "withdraw"];
 
 export const ProfileCard = ({publicKey}: {
     publicKey: string
 }) => {
     const session = useSession()
     const router = useRouter();
+    const [selectedtab, setSelectedTab] = useState("tokens")
     if (session.status === "loading") {
         return <ProfileCardSkeleton />
     }
@@ -30,7 +33,11 @@ export const ProfileCard = ({publicKey}: {
                     image={session.data?.user?.image ?? ""}
                     name={session.data?.user?.name ?? ""}
                 />
-                <Assets publicKey={publicKey} />
+                {tabs.map(tab => <TabButton active={tab === selectedtab} onClick={() => {
+                    setSelectedTab(tab)
+                }}>{tab}</TabButton>)}
+                <div className={`${selectedtab === "tokens" ? "visible"  : "hidden"}`}><Assets publicKey={publicKey} />
+                </div>
             </div>
         </div>
     )
@@ -38,7 +45,7 @@ export const ProfileCard = ({publicKey}: {
 function ProfileCardSkeleton() {
     return (
         <div className="pt-8 flex justify-center">
-            <div className="max-w-4xl bg-white rounded shadow-2xl w-full p-16">
+            <div className="max-w-4xl bg-white rounded shadow-2xl w-full p-16"> 
                 <GreetingSkeleton />
                 <AssetsSkeleton />
             </div>
