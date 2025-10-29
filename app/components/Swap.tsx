@@ -20,7 +20,7 @@ export function Swap({
   const [baseAmount, setBaseAmount] = useState<string>();
   const [quoteAmount, setQuoteAmount] = useState<string>();
   const [fetchingQuote, setFetchingQuote] = useState(false);
-
+  const [quoteResponse, setQuoteResponse] = useState(null);
   // TODO: use async useEffects which can be cancled
   //use debouncing
   useEffect(() => {
@@ -32,6 +32,7 @@ export function Swap({
       
       setQuoteAmount((Number(res.data.outAmount) / Number(10 ** quoteAsset.decimal)).toString())
       setFetchingQuote(false)
+      setQuoteResponse(res.data)
     }).catch(() => setFetchingQuote(false))
   }, [baseAmount, baseAsset, quoteAsset])
 
@@ -105,6 +106,9 @@ export function Swap({
       <div className="pt-1 mt-1 flex justify-end">
         <PrimaryButton  onClick={() => {
             //triger swap
+            axios.post("api/swap", {
+              quoteResponse
+            })
         }}> Swap </PrimaryButton>
       </div>
     </div>
@@ -154,7 +158,7 @@ function SwapInputRow({
           type="number"
           disabled={inputDisabled}
           placeholder="0"
-          value={inputLoading ?  "Loading" : amount}
+          value={inputLoading ?  "Loading" : amount ?? ""}
           className="text-right text-2xl sm:text-3xl md:text-4xl p-6 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
       </div>
@@ -209,6 +213,3 @@ function SwapIcon() {
     </svg>
   );
 }
-
-
-
