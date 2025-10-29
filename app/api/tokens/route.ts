@@ -21,20 +21,23 @@ export async function GET(req: NextRequest) {
 async function getAccountBalance(token: {
     name: string,
     mint: string,
-    native: boolean
+    native: boolean,
+    decimal: number  
 }, address: string) {
 
-    if(token.native) {
-        let balance = await connection.getBalance(new PublicKey(address))
+    if (token.native) {
+        const balance = await connection.getBalance(new PublicKey(address));
         return balance / LAMPORTS_PER_SOL;
     }
 
     try {
-        const ata = await getAssociatedTokenAddress(new PublicKey(token.mint), new PublicKey(address))
+        const ata = await getAssociatedTokenAddress(
+            new PublicKey(token.mint),
+            new PublicKey(address)
+        );
         const balance = await connection.getTokenAccountBalance(ata);
         return Number(balance.value.uiAmount || 0);
     } catch (error: any) {
-        // If account doesn't exist, return 0 balance
         if (error.message?.includes('could not find account')) {
             return 0;
         }

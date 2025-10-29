@@ -3,6 +3,7 @@ import { ReactNode, useActionState, useEffect, useState } from "react";
 import { SUPPORTED_TOKENS, TokenDetails } from "../lib/tokens";
 import { TokenWithBalance } from "../api/hooks/useToken";
 import { PrimaryButton } from "./Button";
+import axios from "axios";
 
 export function Swap({
   publicKey,
@@ -18,7 +19,7 @@ export function Swap({
   const [quoteAsset, setQuoteAsset] = useState(SUPPORTED_TOKENS[2]);
   const [baseAmount, setBaseAmount] = useState<string>();
   const [quoteAmount, setQuoteAmount] = useState<string>();
-
+  const [fetchingQuote, setFetchingQuote] = useState(false);
 
   // TODO: use async useEffects which can be cancled
   //use debouncing
@@ -26,14 +27,22 @@ export function Swap({
     if(!baseAmount){
       return;
     }
-
-  }, [baseAmount, quoteAmount, baseAmount])
+    setFetchingQuote(true);
+    axios.get(`https://lite-api.jup.ag/swap/v1/quote?inputMint=${baseAsset.mint}&outputMint=${quoteAsset.mint}&amount=${Number(baseAmount) * (10 ** baseAsset.decimal)}&slippageBps=50`).then(res => {
+      
+      setQuoteAmount((Number(res.data.outAmount) / Number(10 ** quoteAsset.decimal)).toString())
+      setFetchingQuote(false)
+    }).catch(() => setFetchingQuote(false))
+  }, [baseAmount, baseAsset, quoteAsset])
 
   return (
     <div className="p-5">
       <div className="text-2xl font-bold pb-2 text-slate-600">Swap Tokens</div>
       <SwapInputRow
       amount={baseAmount}
+        onAmountChange={(value: string) => {
+          setBaseAmount(value)
+        }}
         onSelect={(asset) => {
           setBaseAsset(asset);
         }}
@@ -66,7 +75,7 @@ export function Swap({
           <SwapIcon />
         </div>
       </div>
-      <SwapInputRow
+      <SwapInputRow inputLoading={fetchingQuote} inputDisabled={true}
         amount={quoteAmount}
         onAmountChange={(value: string) => {
           setBaseAmount(value)
@@ -111,6 +120,8 @@ function SwapInputRow({
   topBorderEnable,
   bottomBorderEnable,
   subtitle,
+  inputDisabled,
+  inputLoading
 }: {
   onSelect: (asset: TokenDetails) => void;
   selectedToken: TokenDetails;
@@ -120,6 +131,8 @@ function SwapInputRow({
   topBorderEnable: boolean;
   bottomBorderEnable: boolean;
   subtitle?: ReactNode;
+  inputDisabled?: boolean;
+  inputLoading?: boolean
 }) {
   return (
     
@@ -139,8 +152,9 @@ function SwapInputRow({
             onAmountChange?.(e.target.value)
           }} 
           type="number"
+          disabled={inputDisabled}
           placeholder="0"
-          value={amount}
+          value={inputLoading ?  "Loading" : amount}
           className="text-right text-2xl sm:text-3xl md:text-4xl p-6 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
       </div>
@@ -195,3 +209,6 @@ function SwapIcon() {
     </svg>
   );
 }
+
+
+
