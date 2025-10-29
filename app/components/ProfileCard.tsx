@@ -10,6 +10,9 @@ import Image from "next/image";
 import {  TokenWithBalance, useTokens } from "../api/hooks/useToken";
 import { TokenList, TokenRowSkeleton } from "./TokenList";
 import { Swap } from "./Swap";
+import { Send } from "./Send";
+import { AddFunds } from "./AddFunds";
+import { WithDraw } from "./WithDraw";
 
 type Tab = "tokens" | "send" | "add_funds" | "swap" | "withdraw"
 const tabs: {id: Tab, name: string}[] = [
@@ -50,6 +53,12 @@ export const ProfileCard = ({publicKey}: {
                 <div className={`${selectedtab === "tokens" ? "visible"  : "hidden"}`}><Assets tokenBalances={tokenBalances} loading={loading} publicKey={publicKey} />
                 </div>
                 <div className={`${selectedtab === "swap" ? "visible"  : "hidden"}`}> <Swap tokenBalances={tokenBalances} publicKey={publicKey} />
+                </div>
+                <div className={`${selectedtab === "send" ? "visible"  : "hidden"}`}> <Send />
+                </div>
+                <div className={`${selectedtab === "add_funds" ? "visible"  : "hidden"}`}> <AddFunds />
+                </div>
+                <div className={`${selectedtab === "withdraw" ? "visible"  : "hidden"}`}> <WithDraw />
                 </div>
             </div>
         </div>
