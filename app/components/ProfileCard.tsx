@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { PrimaryButton, TabButton } from "./Button";
 import { useActionState, useEffect, useState } from "react";
 import Image from "next/image";
-import {  useTokens } from "../api/hooks/useToken";
+import {  TokenWithBalance, useTokens } from "../api/hooks/useToken";
 import { TokenList, TokenRowSkeleton } from "./TokenList";
 import { Swap } from "./Swap";
 
@@ -26,6 +26,8 @@ export const ProfileCard = ({publicKey}: {
     const session = useSession()
     const router = useRouter();
     const [selectedtab, setSelectedTab] = useState("tokens")
+    const {tokenBalances, loading} = useTokens(publicKey);
+
     if (session.status === "loading") {
         return <ProfileCardSkeleton />
     }
@@ -41,13 +43,13 @@ export const ProfileCard = ({publicKey}: {
                     name={session.data?.user?.name ?? ""}
                 />
                 <div className="w-full flex">
-                    {tabs.map(tab => <TabButton active={tab.id === selectedtab} onClick={() => {
+                    {tabs.map(tab =>  <TabButton key={tab.id} active={tab.id === selectedtab} onClick={() => {
                         setSelectedTab(tab.id)
                     }}>{tab.name}</TabButton>)}
                 </div>
-                <div className={`${selectedtab === "tokens" ? "visible"  : "hidden"}`}><Assets publicKey={publicKey} />
+                <div className={`${selectedtab === "tokens" ? "visible"  : "hidden"}`}><Assets tokenBalances={tokenBalances} loading={loading} publicKey={publicKey} />
                 </div>
-                <div className={`${selectedtab === "swap" ? "visible"  : "hidden"}`}> <Swap publicKey={publicKey} />
+                <div className={`${selectedtab === "swap" ? "visible"  : "hidden"}`}> <Swap tokenBalances={tokenBalances} publicKey={publicKey} />
                 </div>
             </div>
         </div>
@@ -111,11 +113,16 @@ function Greeting({ image, name }: {
     )
 }
 
-function Assets({publicKey}: {
-    publicKey: string
+     
+function Assets({publicKey,tokenBalances, loading }: {
+    publicKey: string;
+    tokenBalances: {
+        totalBalance :number,
+        tokens: TokenWithBalance[]
+    } | null;
+    loading: boolean 
 }) {
     const [copied, setCopied] = useState(false)
-    const {tokenBalances, loading} = useTokens(publicKey);
     useEffect(() => {
         if(copied) {
             let timeout = setTimeout(() => {
